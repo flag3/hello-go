@@ -1,0 +1,34 @@
+[
+  {
+    "class_number": 1,
+    "students": [
+      { "student_number": 1, "name": "Humming" },
+      { "student_number": 2, "name": "masutech16" },
+      { "student_number": 3, "name": "ninja" }
+    ]
+  },
+  {
+    "class_number": 2,
+    "students": [
+      { "student_number": 1, "name": "hukuda222" },
+      { "student_number": 2, "name": "takashi_trap" },
+      { "student_number": 3, "name": "nagatech" },
+      { "student_number": 4, "name": "whiteonion" }
+    ]
+  },
+  {
+    "class_number": 3,
+    "students": [
+      { "student_number": 1, "name": "yamada" },
+      { "student_number": 2, "name": "tubotu" },
+      { "student_number": 3, "name": "tsukatomo" }
+    ]
+  },
+  {
+    "class_number": 4,
+    "students": [
+      { "student_number": 1, "name": "g2" },
+      { "student_number": 2, "name": "hatasa-y" }
+    ]
+  }
+]

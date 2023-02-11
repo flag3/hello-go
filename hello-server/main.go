@@ -5,12 +5,14 @@ import (
   "github.com/labstack/echo/v4"
   "github.com/labstack/echo/v4/middleware"
   "strconv"
+  "encoding/json"
+  "io/ioutil"
 )
 
 type jsonData struct {
-	Number int    `json:"number,omitempty"`
-	String string `json:"string,omitempty"`
-	Bool   bool   `json:"bool,omitempty"`
+  Number int    `json:"number,omitempty"`
+  String string `json:"string,omitempty"`
+  Bool   bool   `json:"bool,omitempty"`
 }
 
 type applicationJsonData struct {
@@ -25,6 +27,17 @@ type applicationJsonDataAnswer struct {
 type applicationJsonDataError struct {
   Error string  `json:"error"`
 }
+
+type Student struct {
+  Number int `json:"student_number"`
+  Name string `json:"name"`
+}
+
+type Class struct {
+  Number int `json:"class_number"`
+  Students []Student `json:"students"`
+}
+
 
 var value int = 0
 
@@ -44,6 +57,7 @@ func main() {
   e.GET("/incremental", incrementalHandler)
   e.GET("/fizzbuzz", fizzbuzzHandler)
   e.POST("application/json", applicationJsonHandler)
+  e.GET("/students/:class/:studentNumber", studentsHandler)
   e.Start(":8080")
 }
 
@@ -114,4 +128,31 @@ func applicationJsonHandler(c echo.Context) error {
   var dataAnswer applicationJsonDataAnswer
   dataAnswer.Answer = data.Right + data.Left
   return c.JSON(http.StatusOK, dataAnswer)
+}
+
+func studentsHandler(c echo.Context) error {
+  bytes, err := ioutil.ReadFile("./students.json")
+  if err != nil {
+    return c.String(http.StatusBadRequest, "Bad Request")
+  }
+
+  var students []Class
+  if err := json.Unmarshal(bytes, &students); err != nil {
+    return c.String(http.StatusBadRequest, "Bad Request")
+  }
+
+  class := c.Param("class")
+  studentNumber := c.Param("studentNumber")
+  n, err1 := strconv.Atoi(class)
+  m, err2 := strconv.Atoi(studentNumber)
+
+  if (err1 != nil || err2 != nil) {
+    return c.String(http.StatusBadRequest, "Bad Request")
+  } else if (n > len(students)) || (m > len(students[n-1].Students)) {
+    var dataError applicationJsonDataError
+    dataError.Error = "Student Not Found"
+    return c.JSON(http.StatusNotFound, dataError)
+  } else {
+    return c.JSON(http.StatusOK, students[n-1].Students[m-1])
+  }
 }
