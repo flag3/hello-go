@@ -8,9 +8,22 @@ import (
 )
 
 type jsonData struct {
-  Number int
-  String string 
-  Bool   bool 
+	Number int    `json:"number,omitempty"`
+	String string `json:"string,omitempty"`
+	Bool   bool   `json:"bool,omitempty"`
+}
+
+type applicationJsonData struct {
+  Right int `json:"right"`
+  Left  int `json:"left"`
+}
+
+type applicationJsonDataAnswer struct {
+  Answer int `json:"answer"`
+}
+
+type applicationJsonDataError struct {
+  Error string  `json:"error"`
 }
 
 var value int = 0
@@ -30,7 +43,7 @@ func main() {
   e.GET("/ping", pingHandler)
   e.GET("/incremental", incrementalHandler)
   e.GET("/fizzbuzz", fizzbuzzHandler)
-  e.GET("/json", jsonHandler)
+  e.POST("application/json", applicationJsonHandler)
   e.Start(":8080")
 }
 
@@ -45,8 +58,7 @@ func jsonHandler(c echo.Context) error {
 
 func postHandler(c echo.Context) error {
   var data jsonData
-
-  if err := c.Bind(&data); err != nil {
+  if err := c.Bind(data); err != nil {
     return c.JSON(http.StatusBadRequest, data)
   }
   return c.JSON(http.StatusOK, data)
@@ -89,4 +101,17 @@ func fizzbuzzHandler(c echo.Context) error {
       return c.String(http.StatusOK, str)
     }
   }
+}
+
+func applicationJsonHandler(c echo.Context) error {
+  var data applicationJsonData
+
+  if err := c.Bind(&data); err != nil {
+    var dataError applicationJsonDataError
+    dataError.Error = "Bad Request"
+    return c.JSON(http.StatusBadRequest, dataError)
+  }
+  var dataAnswer applicationJsonDataAnswer
+  dataAnswer.Answer = data.Right + data.Left
+  return c.JSON(http.StatusOK, dataAnswer)
 }
