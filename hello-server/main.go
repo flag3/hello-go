@@ -38,7 +38,6 @@ type Class struct {
   Students []Student `json:"students"`
 }
 
-
 var value int = 0
 
 func main() {
@@ -47,6 +46,7 @@ func main() {
   e.Use(middleware.Logger())
   e.Use(middleware.Recover())
 
+  e.GET("/incremental/:name", incrementalCookieHandler)
   e.GET("/hello", func(c echo.Context) error {
     return c.String(http.StatusOK, "Hello, World.\n")
   })
@@ -59,6 +59,27 @@ func main() {
   e.POST("application/json", applicationJsonHandler)
   e.GET("/students/:class/:studentNumber", studentsHandler)
   e.Start(":8080")
+}
+
+func incrementalCookieHandler(c echo.Context) error {
+  name := c.Param("name")
+  cookie, err := c.Cookie(name)
+  if err != nil{
+    cookie = new(http.Cookie)
+    cookie.Name = name
+    cookie.Value = "0"
+  } else {
+  }
+  n, err := strconv.Atoi(cookie.Value)
+  if err != nil {
+    return err
+  }
+  n++
+  cookie.Name = name
+  cookie.Value = strconv.Itoa(n)
+  cookie.Path = "/"
+  c.SetCookie(cookie)
+  return c.String(http.StatusOK, cookie.Value)
 }
 
 func jsonHandler(c echo.Context) error {
